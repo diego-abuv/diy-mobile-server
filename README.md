@@ -1,6 +1,14 @@
 # 📱 DIY Mobile Server
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Status-Operacional-brightgreen?style=for-the-badge&logo=android" alt="Status">
+  <img src="https://img.shields.io/badge/Termux-Acessível-orange?style=for-the-badge&logo=termux" alt="Termux">
+  <img src="https://img.shields.io/badge/Cloudflare-Protegido-blue?style=for-the-badge&logo=cloudflare" alt="Cloudflare">
+</p>
+
 Este projeto transforma um dispositivo Android antigo em um servidor funcional com acesso remoto (SSH), gerenciador de arquivos (File Browser) e túnel de acesso externo seguro (Cloudflare), tudo automatizado via Termux e blindado contra quedas de conexão por um sistema de monitoramento dinâmico (Watchdog).
+
+> Ideal para quem quer um NAS de baixo custo e baixo consumo de energia.
 
 ## 🚀 Funcionalidades
 
@@ -11,6 +19,13 @@ Este projeto transforma um dispositivo Android antigo em um servidor funcional c
 * **Configuração Segura**: Uso de variáveis de ambiente através de arquivo `.env`, evitando exposição de credenciais diretamente nos scripts.
 * **Auto-start**: Inicialização automática dos serviços ao ligar o celular através do Termux:Boot.
 * **Resiliência (Watchdog)**: Monitoramento em segundo plano (via Cron) que detecta quedas do túnel e restabelece a conexão sem intervenção manual.
+
+---
+
+## 📸 Preview
+
+|<img src="assets/home-filebrowser.png" width="400"><br><sub>Interface do File Browser</sub> | <img src="assets/notification-bot.png" width="400"><br><sub>Notificação Dinâmica no Discord</sub>|
+| :---: | :---: |
 
 ---
 
@@ -347,25 +362,23 @@ Caso a mensagem seja removida manualmente, o sistema detectará automaticamente 
 
 ## 🏗 Arquitetura Final do Sistema
 
-```text
-[ Galaxy A14 (Servidor NAS) ]
-   ├── SSH Daemon (Porta 8022)
-   ├── File Browser (Porta 8080)
-   ├── Cron Service (crond)
-   │      └── ping_nas.sh (a cada 5 min)
-   │
-   └── Termux:Boot
-          └── start-services.sh
-                   │
-                   ├── Carrega ~/.env
-                   ├── Inicia SSH
-                   ├── Inicia File Browser
-                   ├── Inicia Cloudflare Tunnel
-                   ├── Captura URL Pública
-                   └── Atualiza Discord Webhook
-                             │
-                             ▼
-                    [ Canal Discord ]
+```mermaid
+graph TD
+    A[Galaxy A14 - Android] --> B[Termux:Boot]
+    B --> C{start-services.sh}
+    C --> D[SSH Daemon :8022]
+    C --> E[File Browser :8080]
+    C --> F[Cloudflare Tunnel]
+    C --> G[Cron Service]
+    
+    G --> H[ping_nas.sh Watchdog]
+    H -- Se cair --> C
+    
+    F -- Gera URL --> I[Captura URL]
+    I --> J[Discord Webhook]
+    J -- PATCH/POST --> K((Canal Discord))
+    
+    style A fill:#3DDC84,stroke:#333,stroke-width:2px
 ```
 
 **Resultado:** um servidor Android de baixo custo, com acesso remoto, interface web, túnel seguro, inicialização automática e recuperação autônoma de falhas.
