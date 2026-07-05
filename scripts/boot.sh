@@ -31,6 +31,12 @@ log() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$BOOT_LOG"
 }
 
+get_local_ip() {
+  ip -4 addr show wlan0 2>/dev/null | grep -oP 'inet \K[\d.]+' | head -1
+}
+
+USER_CREATED=false
+
 cleanup() {
   log "Encerrando processos antigos..."
   pkill -f filebrowser 2>/dev/null || true
@@ -110,8 +116,17 @@ patch_or_post_embed() {
 # EXECUÇÃO
 # ==============================================================================
 
+if [[ -f "$LOCK_FILE" ]]; then
+  lock_pid=$(cat "$LOCK_FILE" 2>/dev/null)
+  if [[ -n "$lock_pid" ]] && ! kill -0 "$lock_pid" 2>/dev/null; then
+    rm -f "$LOCK_FILE"
+    log "Lock órfão removido (PID $lock_pid não existe mais)"
+  fi
+fi
+
 exec 9>"$LOCK_FILE"
 flock -n 9 || { echo "[boot.sh] Já está em execução. Abortando." >> "$BOOT_LOG"; exit 1; }
+echo "$$" > "$LOCK_FILE"
 
 mkdir -p "$LOG_DIR" "$DATA_DIR"
 
@@ -148,6 +163,13 @@ if [[ -z "$(command -v filebrowser)" ]]; then
   exit 1
 fi
 
+if [[ ! -f "$FB_DB" ]] || [[ ! -s "$FB_DB" ]]; then
+  filebrowser -d "$FB_DB" config init 2>/dev/null
+  filebrowser -d "$FB_DB" users add admin diy-mobile-2026\! --perm.admin 2>/dev/null
+  USER_CREATED=true
+  log "Usuário admin / diy-mobile-2026! criado no File Browser"
+fi
+
 filebrowser -a 0.0.0.0 -p 8080 -r ~/storage/shared -d "$FB_DB" > "$FB_LOG" 2>&1 &
 log "filebrowser iniciado (porta 8080)"
 
@@ -175,7 +197,6 @@ done
 if [[ -n "$URL" ]]; then
   echo "$URL" > "$URL_FILE"
   log "URL capturada: $URL"
-  echo "🔗 $URL"
 
   if [[ -n "$DISCORD_WEBHOOK_URL" ]]; then
     patch_or_post_embed
@@ -183,5 +204,33 @@ if [[ -n "$URL" ]]; then
 else
   log "ERRO: timeout ao capturar URL do Cloudflare"
 fi
+
+LOCAL_IP=$(get_local_ip)
+
+echo ""
+echo "═══════════════════════════════════════════"
+echo "  ✅ Servidor pronto!"
+echo ""
+
+if [[ -n "$URL" ]]; then
+  echo "  🌐 Público:  $URL"
+fi
+if [[ -n "$LOCAL_IP" ]]; then
+  echo "  🏠 Local:    http://${LOCAL_IP}:8080"
+  echo "  💻 SSH:      ssh $(whoami 2>/dev/null || echo "termux")@${LOCAL_IP} -p 8022"
+fi
+if [[ "$USER_CREATED" == "true" ]]; then
+  echo ""
+  echo "  👤 Usuário:  admin"
+  echo "  🔑 Senha:    diy-mobile-2026!"
+  echo "  ⚠️  Troque a senha no primeiro acesso!"
+fi
+echo ""
+echo "  📋 Comandos:"
+echo "     status      → status dos serviços"
+echo "     cf          → mostra URL atual"
+echo "     derrubatudo → desliga todos os serviços"
+echo "═══════════════════════════════════════════"
+echo ""
 
 log "=== BOOT CONCLUÍDO ==="

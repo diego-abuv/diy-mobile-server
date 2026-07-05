@@ -28,6 +28,7 @@ if [[ -f "scripts/boot.sh" ]]; then
   cp scripts/boot.sh "${REPO_DIR}/scripts/"
   cp scripts/watchdog.sh "${REPO_DIR}/scripts/"
   cp scripts/status.sh "${REPO_DIR}/scripts/"
+  cp scripts/shutdown.sh "${REPO_DIR}/scripts/"
   chmod +x "${REPO_DIR}/scripts/"*.sh
 fi
 
@@ -51,6 +52,7 @@ alias derrubacf='pkill -f cloudflared >/dev/null 2>&1 || true && echo \"[OK] Tú
 alias startenv='echo \"[INFO] Iniciando ambiente...\"; bash ${REPO_DIR}/scripts/boot.sh'
 alias status='bash ${REPO_DIR}/scripts/status.sh'
 alias pingarcf='bash ${REPO_DIR}/scripts/watchdog.sh && echo \"[OK] Watchdog executado\"'
+alias derrubatudo='bash ${REPO_DIR}/scripts/shutdown.sh'
 "
 if ! grep -q "DIY Mobile Server" "${HOME}/.bashrc" 2>/dev/null; then
   echo "$ALIAS_BLOCK" >> "${HOME}/.bashrc"

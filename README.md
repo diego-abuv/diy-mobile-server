@@ -65,6 +65,7 @@ Instale no Android (preferencialmente via F-Droid):
 | `~/diy-mobile-server/scripts/boot.sh` | Script principal de inicialização |
 | `~/diy-mobile-server/scripts/watchdog.sh` | Monitor anti-queda (multi-serviço) |
 | `~/diy-mobile-server/scripts/status.sh` | Dashboard de status do servidor |
+| `~/diy-mobile-server/scripts/shutdown.sh` | Desliga todos os serviços |
 | `~/diy-mobile-server/data/` | Dados runtime (URL atual, ID da msg, DB) |
 | `~/diy-mobile-server/logs/` | Logs de boot, cloudflared, filebrowser, watchdog |
 | `~/.termux/boot/boot.sh` | Ponte para o Termux:Boot chamar `boot.sh` |
@@ -127,6 +128,7 @@ alias derrubacf='pkill -f cloudflared >/dev/null 2>&1 || true && echo "[OK] Tún
 alias startenv='echo "[INFO] Iniciando ambiente..."; bash ~/diy-mobile-server/scripts/boot.sh'
 alias status='bash ~/diy-mobile-server/scripts/status.sh'
 alias pingarcf='bash ~/diy-mobile-server/scripts/watchdog.sh && echo "[OK] Watchdog executado"'
+alias derrubatudo='bash ~/diy-mobile-server/scripts/shutdown.sh'
 ```
 
 ```bash
@@ -162,6 +164,43 @@ A cada boot ou renovação do túnel, o sistema:
 
 ```bash
 cf   # exibe a URL atual
+```
+
+---
+
+## 🛑 Gerenciamento de Serviços
+
+### Desligar o servidor
+
+```bash
+derrubatudo
+```
+
+Remove wake-lock, para cloudflared, filebrowser, sshd e crond. Para reiniciar:
+
+```bash
+startenv
+```
+
+### Credenciais padrão (File Browser)
+
+Na primeira execução com DB vazio, o sistema cria automaticamente:
+
+| Campo | Valor |
+|---|---|
+| Usuário | `admin` |
+| Senha | `diy-mobile-2026!` |
+
+**Troque a senha no primeiro acesso** pelo painel (⚙️ → Configurações → Usuário).
+
+### Resetar senha do File Browser
+
+Caso perca a senha:
+
+```bash
+derrubatudo                                                                  # para o filebrowser
+rm -f ~/diy-mobile-server/data/filebrowser.db                               # remove DB
+startenv                                                                     # recria tudo com admin / diy-mobile-2026!
 ```
 
 ---

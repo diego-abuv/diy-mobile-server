@@ -12,8 +12,16 @@ BOOT_SCRIPT="${PROJECT_DIR}/scripts/boot.sh"
 WD_LOG="${LOG_DIR}/watchdog.log"
 LOCK_FILE="${TMPDIR:-/data/data/com.termux/files/usr/tmp}/diy-watchdog.lock"
 
+if [[ -f "$LOCK_FILE" ]]; then
+  lock_pid=$(cat "$LOCK_FILE" 2>/dev/null)
+  if [[ -n "$lock_pid" ]] && ! kill -0 "$lock_pid" 2>/dev/null; then
+    rm -f "$LOCK_FILE"
+  fi
+fi
+
 exec 9>"$LOCK_FILE"
 flock -n 9 || exit 0
+echo "$$" > "$LOCK_FILE"
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$WD_LOG"; }
 
