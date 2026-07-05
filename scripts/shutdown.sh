@@ -19,10 +19,6 @@ echo "════════════════════════�
 pkill -f cloudflared 2>/dev/null && echo "  ✅ cloudflared parado"   || echo "  ℹ️  cloudflared não estava rodando"
 pkill -f filebrowser 2>/dev/null && echo "  ✅ filebrowser parado"   || echo "  ℹ️  filebrowser não estava rodando"
 
-if pgrep -x sshd >/dev/null; then
-  pkill -x sshd 2>/dev/null && echo "  ✅ sshd parado"
-fi
-
 if pgrep -x crond >/dev/null; then
   pkill -x crond 2>/dev/null && echo "  ✅ crond parado"
 fi
@@ -39,5 +35,6 @@ echo "════════════════════════�
 echo "  🛑 Servidor desligado em $(date '+%d/%m/%Y %H:%M:%S')"
 echo ""
 echo "  ▶️  Para reiniciar: startenv"
+echo "  ℹ️  SSH permanece ativo (porta 8022)"
 echo "═══════════════════════════════════════════"
 echo ""
