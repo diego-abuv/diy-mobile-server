@@ -18,7 +18,7 @@ URL_FILE="${DATA_DIR}/current_url.txt"
 MSG_ID_FILE="${DATA_DIR}/msg_id.txt"
 FB_DB="${DATA_DIR}/filebrowser.db"
 
-LOCK_FILE="/tmp/diy-boot.lock"
+LOCK_FILE="${TMPDIR:-/data/data/com.termux/files/usr/tmp}/diy-boot.lock"
 
 MAX_RETRIES=20
 RETRY_DELAY=2

@@ -13,6 +13,8 @@ WD_LOG="${LOG_DIR}/watchdog.log"
 URL_FILE="${DATA_DIR}/current_url.txt"
 MSG_ID_FILE="${DATA_DIR}/msg_id.txt"
 
+mkdir -p "$LOG_DIR" "$DATA_DIR" 2>/dev/null
+
 decode_snowflake() {
   local id=$1
   local ts_ms=$(( (id >> 22) + 1420070400000 ))

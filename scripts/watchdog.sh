@@ -10,7 +10,7 @@ PROJECT_DIR="${HOME}/diy-mobile-server"
 LOG_DIR="${PROJECT_DIR}/logs"
 BOOT_SCRIPT="${PROJECT_DIR}/scripts/boot.sh"
 WD_LOG="${LOG_DIR}/watchdog.log"
-LOCK_FILE="/tmp/diy-watchdog.lock"
+LOCK_FILE="${TMPDIR:-/data/data/com.termux/files/usr/tmp}/diy-watchdog.lock"
 
 exec 9>"$LOCK_FILE"
 flock -n 9 || exit 0
