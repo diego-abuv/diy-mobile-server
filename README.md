@@ -171,13 +171,18 @@ cf   # exibe a URL atual
 
 ## 🛡️ Brute Force Guard
 
-O script `scripts/brute-guard.sh` roda a cada 1 minuto via cron e:
+O script `scripts/brute-guard.sh` roda a cada 1 minuto via cron e protege o servidor contra ataques de força bruta sem custo adicional:
 
-- Monitora o log do File Browser em busca de tentativas de login inválidas (`403`)
-- Se detectar **5+ tentativas em 2 minutos**, derruba automaticamente cloudflared e filebrowser
+- Monitora o log do File Browser em busca de tentativas de login inválidas (`HTTP 403`)
+- Se detectar **5+ tentativas em 2 minutos**, derruba **apenas o túnel Cloudflare** (acesso externo)
+- O **acesso local (Wi-Fi)** permanece intacto — SSH e File Browser continuam funcionando na rede de casa
 - Envia alerta no Discord com o número de tentativas
-- Respeita cooldown de 5 minutos para evitar re-triggers
-- O cooldown é resetado automaticamente ao executar `startenv`
+- Respeita cooldown de 5 minutos para evitar re-triggers em loop
+- Após 5 minutos, o **Watchdog** detecta o túnel caído e o recria automaticamente
+- Se o ataque persistir, o ciclo se repete — protegendo sem intervenção manual
+- O cooldown é resetado ao executar `startenv`
+
+> **Modelo de segurança:** O projeto prioriza a **usabilidade familiar** com proteção contra ameaças comuns (bots, scanners, curiosos), sem depender de domínio próprio ou serviços pagos. O acesso externo via trycloudflare é tolerante a quedas — se for derrubado, se recupera sozinho em minutos.
 
 ## 🛑 Gerenciamento de Serviços
 

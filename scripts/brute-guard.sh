@@ -77,6 +77,9 @@ fi
 # Registra cooldown
 date +%s > "$TRIGGER_FILE"
 
-# Derruba serviços expostos
-LOG_DIR="$LOG_DIR" bash "${PROJECT_DIR}/scripts/shutdown.sh"
-log "Servidor derrubado por brute force"
+# Corta acesso externo (mata só o túnel, mantém filebrowser local + crond)
+pkill -f cloudflared 2>/dev/null
+log "Túnel cloudflared derrubado por brute force"
+
+# Acesso local (Wi-Fi) continua funcionando normalmente
+log "Acesso local preservado (SSH + File Browser na rede local)"
