@@ -29,6 +29,7 @@ if [[ -f "scripts/boot.sh" ]]; then
   cp scripts/watchdog.sh "${REPO_DIR}/scripts/"
   cp scripts/status.sh "${REPO_DIR}/scripts/"
   cp scripts/shutdown.sh "${REPO_DIR}/scripts/"
+  cp scripts/brute-guard.sh "${REPO_DIR}/scripts/"
   chmod +x "${REPO_DIR}/scripts/"*.sh
 fi
 
@@ -62,8 +63,9 @@ else
 fi
 
 # Watchdog no crontab
-(crontab -l 2>/dev/null | grep -v "watchdog.sh"; echo "*/5 * * * * bash ${REPO_DIR}/scripts/watchdog.sh") | crontab -
+(crontab -l 2>/dev/null | grep -v "watchdog.sh" | grep -v "brute-guard.sh"; echo "*/5 * * * * bash ${REPO_DIR}/scripts/watchdog.sh"; echo "* * * * * bash ${REPO_DIR}/scripts/brute-guard.sh") | crontab -
 echo "  Watchdog configurado no crontab (a cada 5 min)"
+echo "  Brute-guard configurado no crontab (a cada 1 min)"
 
 echo ""
 echo "=== Instalação concluída! ==="

@@ -66,6 +66,7 @@ Instale no Android (preferencialmente via F-Droid):
 | `~/diy-mobile-server/scripts/watchdog.sh` | Monitor anti-queda (multi-serviço) |
 | `~/diy-mobile-server/scripts/status.sh` | Dashboard de status do servidor |
 | `~/diy-mobile-server/scripts/shutdown.sh` | Desliga todos os serviços |
+| `~/diy-mobile-server/scripts/brute-guard.sh` | Detecta brute force e derruba o servidor |
 | `~/diy-mobile-server/data/` | Dados runtime (URL atual, ID da msg, DB) |
 | `~/diy-mobile-server/logs/` | Logs de boot, cloudflared, filebrowser, watchdog |
 | `~/.termux/boot/boot.sh` | Ponte para o Termux:Boot chamar `boot.sh` |
@@ -167,6 +168,16 @@ cf   # exibe a URL atual
 ```
 
 ---
+
+## 🛡️ Brute Force Guard
+
+O script `scripts/brute-guard.sh` roda a cada 1 minuto via cron e:
+
+- Monitora o log do File Browser em busca de tentativas de login inválidas (`403`)
+- Se detectar **5+ tentativas em 2 minutos**, derruba automaticamente cloudflared e filebrowser
+- Envia alerta no Discord com o número de tentativas
+- Respeita cooldown de 5 minutos para evitar re-triggers
+- O cooldown é resetado automaticamente ao executar `startenv`
 
 ## 🛑 Gerenciamento de Serviços
 

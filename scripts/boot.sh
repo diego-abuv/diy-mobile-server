@@ -130,6 +130,9 @@ echo "$$" > "$LOCK_FILE"
 
 mkdir -p "$LOG_DIR" "$DATA_DIR"
 
+rm -f "$DATA_DIR/BRUTE_TRIGGERED"
+log "Cooldown do brute-guard resetado"
+
 log "=== INÍCIO DO BOOT ==="
 
 if [[ ! -f "$ENV_FILE" ]]; then
