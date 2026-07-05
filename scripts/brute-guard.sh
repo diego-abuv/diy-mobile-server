@@ -24,6 +24,9 @@ log() {
 # Se o filebrowser não está rodando, não há o que proteger
 pkill -0 -f filebrowser 2>/dev/null || exit 0
 
+# Se o túnel já está caído, não há acesso externo para proteger
+pkill -0 -f cloudflared 2>/dev/null || exit 0
+
 # Cooldown: se já foi acionado nos últimos 5 min, sai
 if [[ -f "$TRIGGER_FILE" ]]; then
   trigger_ts=$(cat "$TRIGGER_FILE" 2>/dev/null || echo 0)
